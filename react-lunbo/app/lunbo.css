@@ -58,14 +58,15 @@ ul {
     display: inline-block;
     width: 16px;
     height: 16px;
-    background: #eee;
+    background-color: #eee;
     border-radius: 8px;
     margin-right: 8px;
-    float: left;
+    /*float: left;*/
     cursor: pointer;
 }
-.dots.active {
-    background: #000;
+.active {
+    composes: dots;
+    background-color: #000;
 }
 .dots-wrap {
     overflow: hidden;
