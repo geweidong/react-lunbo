@@ -7,11 +7,11 @@ const config = {
         require('./img/5.jpg'),
     ],
     linkArray: [
-        "http://bj.ganji.com",
-        "http://bj.ganji.com",
-        "http://bj.ganji.com",
-        "http://bj.ganji.com",
-        "http://bj.ganji.com",
+        "http://baidu.com",
+        "http://baidu.com",
+        "http://baidu.com",
+        "http://baidu.com",
+        "http://baidu.com",
 
     ],
     lunboObject: {
@@ -19,7 +19,7 @@ const config = {
         "height":270,               //幻灯片的高度
         "imgWidth":640,  //幻灯片第一帧的宽度
         "imgHeight":270, //幻灯片第一帧的高度
-        "interval": 1000,
+        "interval": 1500,
         "scale":0.9, //记录显示比例关系
         "direction": "left",
         "number": 5,

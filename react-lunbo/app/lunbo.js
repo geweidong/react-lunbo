@@ -11,37 +11,35 @@ export default class LunBoControl extends Component {
         this.state = {
             // 中间值
             middleIndex: Math.ceil(this.props.number / 2),
-            activeIndex: 0
+            // activeIndex: 0,
+            pause: false,
+            rotateFlag: true,
         };
-        this.itemsArr = []
+
+        this.itemsArr = [];
+        this.activeIndex = 0;
     }
 
     componentWillMount() {
         clearInterval(this.timer);
     }
-    
-    // 缓动动画
-    animate(obj,attr_json) {  
-
-        this.timer=setInterval(function(){
-            
-            /*遍历并操作json数据集合对象中样式属性和值*/
-            for(var attr in attr_json){
-                var current=0;      
+    animate(obj,attr_json,_fn) {
+        //清除定时器，防止函数未执行完而连续操作本函数
+        clearInterval(obj.timer);
+        obj.timer=setInterval(function(){
+            let flag=true;  //清楚定时器的标识
+            for(let attr in attr_json){
+                let current=0;      
                 if(attr=="opacity"){
                     
-                    current=Math.round(parseInt(obj.style[attr]*100))||0;
-                }else{  
+                    current=Math.round(obj.style[attr]*100)||0;
+                }else{  //其他属性值
                     current=parseInt(obj.style[attr]);
-
                 }
-                var step=(attr_json[attr]-current)/10;
-                
+                let step=(attr_json[attr]-current)/10;
                 step=step>0?Math.ceil(step):Math.floor(step);
-
-                
-                if(attr=="opacity"){
-                        obj.style.opacity=(current+step)/100;
+                if(attr == "opacity"){
+                    obj.style.opacity = (current+step)/100;
                 }
                 else if(attr=="zIndex"){
                         obj.style.zIndex=current+step;
@@ -49,56 +47,116 @@ export default class LunBoControl extends Component {
                 else{
                     obj.style[attr]=(current+step)+"px";
                 }
-                
-            }
-           
-        }.bind(this),20)
-       
-    }  
 
-    componentDidMount() {
-       for(var i=0;i<this.props.lunboObject.number;i++){
-            console.log(234234)
-            this.itemsArr.push(findDOMNode(this.refs['items'+(i)]));
-       }
+                if(current!=attr_json[attr]){ 
+                    flag=false;
+                }
+            }
+            if(flag){
+                clearInterval(obj.timer);  
+                if(_fn){
+                    _fn()
+                }
+            }
+            
+        },20)
     }
 
-    playRight() {
+    componentDidMount() {
+       for(let i=0;i<this.props.lunboObject.number;i++){
+            this.itemsArr.push(findDOMNode(this.refs['items'+(i)]));
+       };
         this.autoPlay();
     }
 
-    autoPlay() {
-        let len = this.itemsArr.length;
-        // let next= this.itemsArr[0];
-        this.itemsArr.forEach((item, index) => {
-            let self = item;
-            let next = this.itemsArr[index+1];
-            if(index == 4){
-                next = this.itemsArr[0];
+    playCarousel(direction) {
+            let len = this.itemsArr.length;
+
+            if(direction == 'left'){
+                this.activeIndex--;
+                if(this.activeIndex < 0){
+                    this.activeIndex = (len-1);
+                }
+                this.itemsArr.forEach((item, index) => {
+                    let self = item;
+                    let next = this.itemsArr[index+1];
+                    if(index == (len-1)){
+                        next = this.itemsArr[0];
+                    }
+                    
+                    let left = parseInt(next.style.left);
+                    let width = parseInt(next.style.width);
+                    let height = parseInt(next.style.height);
+                    let zIndex = parseInt(next.style.zIndex);
+                    let opacity = (next.style.opacity)*100;
+
+                    this.animate(self, {left:left,width:width,height:height,zIndex:zIndex,opacity:opacity},() => {
+                        this.setState({
+                            rotateFlag: true,
+                        })
+                    });
+                })
+            }else if(direction == 'right'){
+                this.activeIndex++;
+                if(this.activeIndex > (len-1)){
+                    this.activeIndex = 0;
+                }
+                this.itemsArr.forEach((item, index) => {
+
+                    let self = item;
+                    let prev = this.itemsArr[index-1];
+                    if(index == 0){
+                        prev = this.itemsArr[len-1];
+                    }
+                    
+                    let left = parseInt(prev.style.left);
+                    let width = parseInt(prev.style.width);
+                    let height = parseInt(prev.style.height);
+                    let zIndex = parseInt(prev.style.zIndex);
+                    let opacity = (prev.style.opacity)*100;
+
+                    this.animate(self, {left:left,width:width,height:height,zIndex:zIndex,opacity:opacity},() => {
+                        
+                        this.setState({
+                            rotateFlag: true,
+                        })
+                    });
+                })
             }
-            console.log(next,index)
-            let left = parseInt(next.style.left);
-            let width = parseInt(next.style.width);
-            let height = parseInt(next.style.height);
-            console.log(left)
-            this.animate(self, {left:left,width:width,height:height});
-            // next = this.itemsArr[index+1];
-        })
+            
+    }
+    // 自己动
+    autoPlay() {
+        this.timer = setInterval(() => {
+            this.clickNext()
+        },this.props.lunboObject.interval);
     }
 
     componentWillUnmount() {
-        
+        clearInterval(this.timer);
     }
     // 点击左侧按钮
     clickPrev() {
-       this.playRight();
-
+        if(this.state.rotateFlag){
+            this.setState({
+                rotateFlag: false
+            })
+            this.playCarousel('left');
+        }
+       
+    }
+    // 点击右侧按钮
+    clickNext() {
+        if(this.state.rotateFlag){
+            this.setState({
+                rotateFlag: false
+            })
+            this.playCarousel('right');
+        }
+        
     }
     // 渲染item的样式style
     renderstyle(index) {
-        // this.setState({
-        //     activeIndex: index
-        // });
 
         const middleIndex = Math.floor(this.props.lunboObject.number / 2);
         const btnWidth = (this.props.lunboObject.width-this.props.lunboObject.imgWidth) / 2;
@@ -134,16 +192,42 @@ export default class LunBoControl extends Component {
         }
     }
 
+    // 鼠标移入移出
+    mouseHandle(e) {
+        if(e.type === 'mouseover'){
+            clearInterval(this.timer);
+            this.setState({pause : true});
+        }else if(e.type === 'mouseleave'){
+            this.setState({pause : false});
+            this.autoPlay();
+        }
+    }
+
+    // 小圆点样式
+    checkDots(index) {
+        return index === this.activeIndex? style.active : style.dots;
+    }
+
+    // 点击小圆点点
+    clickDots(index) {
+        
+    }
+
     render() {
         const btnWidth = (this.props.lunboObject.width-this.props.lunboObject.imgWidth) / 2;
         
         return (
-            <div className={style['poster-main']} style={{width:this.props.lunboObject.width}}>
-                <div className={style["poster-prev-btn"]} style={{width:btnWidth}} onClick={this.clickPrev.bind(this)}></div>
+            <div className={style['poster-main']} style={{width:this.props.lunboObject.width}} onMouseOver={this.mouseHandle.bind(this)} onMouseLeave={this.mouseHandle.bind(this)}>
+                <div className={style["poster-prev-btn"]} style={{width:btnWidth}} onClick={()=>this.clickPrev()}></div>
                 <div className={style['dots-wrap']}>
-                    
+                    {/*这里放置小圆点点*/}
+                    {
+                        this.props.imgArray.map(function(item,index){
+                            return <span key={index} onClick={()=>this.clickDots(index)} className={this.checkDots(index)}></span>;
+
+                        }.bind(this))
+                    }
                 </div>
-               
                 <ul className={style['poster-list']} style={{width:this.props.lunboObject.width}}>
                    {
                         this.props.imgArray.map(function(item,index){
@@ -152,8 +236,7 @@ export default class LunBoControl extends Component {
                         }.bind(this))
                    }
                 </ul>
-                
-                <div className={style["poster-next-btn"]} style={{width:btnWidth}}></div>
+                <div className={style["poster-next-btn"]} style={{width:btnWidth}} onClick={() => this.clickNext()}></div>
             </div>);
     }
 }

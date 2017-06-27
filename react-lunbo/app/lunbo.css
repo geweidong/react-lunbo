@@ -23,7 +23,6 @@ body{color:#666; background-color:#fff;font: 12px/1.5 '微软雅黑',tahoma,aria
 .poster-main{ position:relative;width:800px;height:270px;margin: 30px auto;}
 
 .poster-list{width:800px;height:270px;position: relative;}
-.poster-main a,.poster-main img{display:block;}
 .poster-item{ position:absolute;bottom:0;}
 .poster-btn{ position:absolute;top:0;width:100px;height:270px; z-index:1000000; cursor:pointer;  opacity:0.8}
 .poster-prev-btn{composes: poster-btn;left:0; background: url(./img/btn_l.png) no-repeat center center;}
@@ -37,19 +36,19 @@ body{color:#666; background-color:#fff;font: 12px/1.5 '微软雅黑',tahoma,aria
     background-color: #eee;
     border-radius: 8px;
     margin-right: 8px;
-    /*float: left;*/
     cursor: pointer;
 }
 .active {
     composes: dots;/*继承dots*/
-    background-color: #000;
+    background-color: #9a98a7;
 }
 .dots-wrap {
     overflow: hidden;
     position: absolute;
-    z-index: 99;
+    z-index: 99999;
     bottom: 10px;
-    right: 20px;
+    left: 50%;
+    margin-left: -60px;
 }
 
 
