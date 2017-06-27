@@ -1,212 +1,179 @@
 
 import style from './lunbo.css';
-import ReactDOM from 'react-dom';
+import {findDOMNode} from 'react-dom';
 import React, {Component} from 'react'
 import data from './config.js';
 
-class LunBoControl extends Component {
+export default class LunBoControl extends Component {
     
     constructor(props){
         super(props);
         this.state = {
-            activeIndex:1,
-            offsetDistance:this.props.direction == 'right' || this.props.direction == 'left' ? -this.props.imgWidth : -this.props.imgHeight,
-            pause:false,
-            flag:true
+            // 中间值
+            middleIndex: Math.ceil(this.props.number / 2),
+            activeIndex: 0
         };
+        this.itemsArr = []
     }
 
     componentWillMount() {
-        this.direction = this.props.direction === 'left' || this.props.direction === 'right'? 'x' : 'y';
+        clearInterval(this.timer);
     }
+    
+    // 缓动动画
+    animate(obj,attr_json) {  
+
+        this.timer=setInterval(function(){
+            
+            /*遍历并操作json数据集合对象中样式属性和值*/
+            for(var attr in attr_json){
+                var current=0;      
+                if(attr=="opacity"){
+                    
+                    current=Math.round(parseInt(obj.style[attr]*100))||0;
+                }else{  
+                    current=parseInt(obj.style[attr]);
+
+                }
+                var step=(attr_json[attr]-current)/10;
+                
+                step=step>0?Math.ceil(step):Math.floor(step);
+
+                
+                if(attr=="opacity"){
+                        obj.style.opacity=(current+step)/100;
+                }
+                else if(attr=="zIndex"){
+                        obj.style.zIndex=current+step;
+                }
+                else{
+                    obj.style[attr]=(current+step)+"px";
+                }
+                
+            }
+           
+        }.bind(this),20)
+       
+    }  
 
     componentDidMount() {
+       for(var i=0;i<this.props.lunboObject.number;i++){
+            console.log(234234)
+            this.itemsArr.push(findDOMNode(this.refs['items'+(i)]));
+       }
+    }
+
+    playRight() {
         this.autoPlay();
     }
 
-    componentWillUnmount() {
-        clearTimeout(this.timeOuter);
-        clearInterval(this.timer);
-    }
-
     autoPlay() {
-        switch(this.props.direction){
-        case 'right' : 
-            this.timerOuter=setTimeout(this.playRight,this.props.interval);
-            this.direction='x';
-            break;
-        case 'left'  : 
-            this.timerOuter=setTimeout(this.playLeft.bind(this),this.props.interval);
-            this.direction='x';
-            break;
-        case 'top'   : 
-            this.timerOuter=setTimeout(this.playLeft.bind(this),this.props.interval);
-            this.direction='y';
-            break;
-        case 'bottom': 
-            this.timerOuter=setTimeout(this.playRight,this.props.interval);
-            this.direction='y';
-            break;
-        };
-    }
-
-    directionHandle() {
-        if(this.direction === 'y'){
-            return {top : this.state.offsetDistance+'px',width : this.props.imgWidth,height : this.props.imgHeight*(this.props.number+2),overflow:'hidden'};
-        }else {
-
-            return {left : this.state.offsetDistance+'px',width : this.props.imgWidth*(this.props.number+2),height : this.props.imgHeight};
-        }
-    }
-
-    mouseHandle(e) {
-        if(e.type === 'mouseover'){
-            this.setState({
-                pause : true
-            });
-        }else if(e.type === 'mouseleave'){
-            this.setState({pause : false});
-            this.autoPlay();
-        }
-    }
-    /*圆点显示效果*/
-    checkDots(index) {
-        var activeIndex;
-        if(this.state.activeIndex === this.props.number+1){
-            activeIndex = 1;
-        }else if(this.state.activeIndex === 0){
-            activeIndex = this.props.number;
-        }else {
-            activeIndex = this.state.activeIndex;
-        }
-        return index+1 === activeIndex? style.active : style.dots;
-    }
-
-    dotsHover(index) {
-        clearInterval(this.timer);
-        this.setState({activeIndex:index+1});
-        this.position();
-    }
-
-    /*向右或向下*/
-    playRight(indexIn) {
-        console.log(indexIn)
-        if(this.state.flag){
-            var index=indexIn?indexIn:this.state.activeIndex+1;
-            this.setState({activeIndex:index});
-            this.position();
-        }
-    }
-    /*向左或向上*/
-    playLeft(indexIn) {
-        if(this.state.flag){
-            var index=indexIn?indexIn:this.state.activeIndex-1;
-            this.setState({activeIndex:index});
-            this.position();
-        }
-    }
-    /*运动效果*/
-    position() {
-        this.setState({flag:false});
-        this.timer = setInterval(function(){
-            if(this.direction === 'x'){
-                var boxDistance = this.props.imgWidth;
-            }else {
-                var boxDistance = this.props.imgHeight;
+        let len = this.itemsArr.length;
+        // let next= this.itemsArr[0];
+        this.itemsArr.forEach((item, index) => {
+            let self = item;
+            let next = this.itemsArr[index+1];
+            if(index == 4){
+                next = this.itemsArr[0];
             }
-            var offsetDistance = this.state.offsetDistance;
-            if(Math.abs(offsetDistance-(-boxDistance*this.state.activeIndex)) <= 0.09){
-                offsetDistance = -boxDistance*this.state.activeIndex;
-                clearInterval(this.timer);
-                this.setState({flag:true});
-                if(this.state.activeIndex > this.props.number){
-                    offsetDistance = -boxDistance;
-                    this.setState({activeIndex : 1});
-                }else if(this.state.activeIndex === 0){
-                    offsetDistance = -boxDistance*this.props.number;
-                    this.setState({activeIndex : this.props.number});
-                }
-                this.setState({offsetDistance:offsetDistance});
-                if(!this.state.pause){
-                    this.autoPlay();
-                }
-            }else{
-                offsetDistance = offsetDistance-(boxDistance*this.state.activeIndex-Math.abs(offsetDistance))/30;
-                this.setState({offsetDistance:offsetDistance});
-            }
-        }.bind(this),10);
+            console.log(next,index)
+            let left = parseInt(next.style.left);
+            let width = parseInt(next.style.width);
+            let height = parseInt(next.style.height);
+            console.log(left)
+            this.animate(self, {left:left,width:width,height:height});
+            // next = this.itemsArr[index+1];
+        })
     }
-    /*点击向左按钮*/
-    left() {
-        var oldIndex=this.state.activeIndex;
-        this.playLeft(oldIndex-1);
+
+    componentWillUnmount() {
+        
     }
-    /*点击向右按钮*/
-    right() {
-        var oldIndex=this.state.activeIndex;
-        this.playRight(oldIndex+1);
+    // 点击左侧按钮
+    clickPrev() {
+       this.playRight();
+
     }
+    // 渲染item的样式style
+    renderstyle(index) {
+        // this.setState({
+        //     activeIndex: index
+        // });
+
+        const middleIndex = Math.floor(this.props.lunboObject.number / 2);
+        const btnWidth = (this.props.lunboObject.width-this.props.lunboObject.imgWidth) / 2;
+        const gap = btnWidth/middleIndex;
+        let Imgleft;
+        let Imgright;
+        let scale  = 1;
+        let zIndex = 100;
+        let opacity = 1;
+
+        if(index <= middleIndex){
+            // 右侧图片
+            scale = Math.pow(0.9, (index));
+            Imgleft = this.props.lunboObject.width - (middleIndex-index)*gap - this.props.lunboObject.imgWidth*scale;
+            zIndex=middleIndex+1 - index;
+            opacity=1/++index;
+
+        }else if(index > middleIndex){
+
+            // 左侧图片
+            scale = Math.pow(0.9, (this.props.lunboObject.number-index));
+            Imgleft = (index-(middleIndex+1))*gap;
+            zIndex=index-middleIndex;
+            opacity=(1-1/++index);
+        }
+
+        return {
+            width: this.props.lunboObject.imgWidth*scale,
+            height: this.props.lunboObject.imgHeight*scale, 
+            left:Imgleft,
+            zIndex:zIndex,
+            opacity:opacity
+        }
+    }
+
     render() {
-        var _this = this;
+        const btnWidth = (this.props.lunboObject.width-this.props.lunboObject.imgWidth) / 2;
+        
         return (
+            <div className={style['poster-main']} style={{width:this.props.lunboObject.width}}>
+                <div className={style["poster-prev-btn"]} style={{width:btnWidth}} onClick={this.clickPrev.bind(this)}></div>
+                <div className={style['dots-wrap']}>
+                    
+                </div>
+               
+                <ul className={style['poster-list']} style={{width:this.props.lunboObject.width}}>
+                   {
+                        this.props.imgArray.map(function(item,index){
+                            return <li ref={'items'+index} className={style['poster-item']} style={this.renderstyle(index)} key={index}><a href={this.props.linkArray[index]}><img width="100%" height="100%" src={item}/></a></li>;
 
-            <div className={this.props.boxStyle} style={{width:this.props.imgWidth, height:this.props.imgHeight}} onMouseOver={this.mouseHandle.bind(this)} onMouseLeave={this.mouseHandle.bind(this)}>
-            <span className="leftIcon" onClick={this.left.bind(this)}></span>
-            <span className="rightIcon" onClick={this.right.bind(this)}></span>
-            <div className="dots-wrap">
-                {   
-                    React.Children.map(this.props.children,function(elem,index){
-                        return (<span className={_this.checkDots(index)} onMouseOver={_this.dotsHover.bind(_this,index)}></span>);
-                    })
-                }
-            </div>
-            <div style={{width:this.props.imgWidth,overflow: 'hidden'}}>
-                <ul style={this.directionHandle()}>
-                    {this.props.children[this.props.number-1]}
-                    {this.props.children}
-                    {this.props.children[0]}
+                        }.bind(this))
+                   }
                 </ul>
-            </div>
-        </div>);
+                
+                <div className={style["poster-next-btn"]} style={{width:btnWidth}}></div>
+            </div>);
     }
 }
 
 
 
 LunBoControl.propTypes = {
-    defaultActiveIndex:React.PropTypes.number,
-    interval:React.PropTypes.number,
-    direction:React.PropTypes.string,
-    number:React.PropTypes.number,
-    boxStyle:React.PropTypes.string,
-    imgWidth:React.PropTypes.number.isRequired,
-    imgHeight:React.PropTypes.number.isRequired
+    // defaultActiveIndex:React.PropTypes.number,
+    // interval:React.PropTypes.number,
+    // direction:React.PropTypes.string,
+    // number:React.PropTypes.number,
+    // boxStyle:React.PropTypes.string,
+    // imgWidth:React.PropTypes.number.isRequired,
+    // imgHeight:React.PropTypes.number.isRequired
 };
 LunBoControl.defaultProps = {
-    direction:'right',
-    interval: 1000,
-    boxStyle:'content'
+    // direction:'right',
+    // interval: 1000,
+    // boxStyle:'content'
 }
 
 
 
-var LunBoComponent = React.createClass({
-    propsTypes : {
-        lunboObject : React.PropTypes.object.isRequired,
-        imgArray : React.PropTypes.array.isRequired,
-        linkArray : React.PropTypes.array
-    },
-    render : function(){
-        
-        return (
-                <LunBoControl interval={this.props.lunboObject.interval} number={this.props.lunboObject.number} boxStyle={this.props.lunboObject.boxStyle} imgWidth={this.props.lunboObject.imgWidth} imgHeight={this.props.lunboObject.imgHeight} direction={this.props.lunboObject.direction}>
-                    {    
-                        this.props.imgArray.map(function(item,index){
-                            return <li key={index}><a href={this.props.linkArray[index]}><img width={this.props.lunboObject.imgWidth} height={this.props.lunboObject.imgHeight} src={item}/></a></li>;
-                        }.bind(this))
-                    }
-                </LunBoControl>
-        );
-    }
-});
-module.exports = LunBoComponent;
