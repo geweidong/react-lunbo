@@ -269,10 +269,12 @@ export default class LunBoControl extends Component {
             frameNumber++;
             if(frameNumber == maxFrameNumber){
                 for(var k in targetJSON){
-                    if(k != "opacity"){
-                        elem.style[k] = targetJSON[k] + "px";
-                    }else{
+                    if(k == "opacity"){
                         elem.style[k] = targetJSON[k];
+                    }else if(k == 'zIndex'){
+                        elem.style[k] = targetJSON[k];
+                    }else{
+                        elem.style[k] = targetJSON[k] + "px";
                     }
                 }
                 //停表
@@ -290,7 +292,7 @@ export default class LunBoControl extends Component {
             let width = Number.parseInt(next.style.width);
             let height = Number.parseInt(next.style.height);
             let zIndex = Number.parseInt(next.style.zIndex);
-            let opacity = (parseFloat(next.style.opacity).toFixed(2))*100;
+            let opacity = parseFloat(next.style.opacity).toFixed(2);
             this.animate(self, {left:left,width:width,height:height,zIndex:zIndex,opacity: opacity,top:top}, 300, 'QuadEaseIn', () => {
                 ++this.LOOPNUM ;
             });
