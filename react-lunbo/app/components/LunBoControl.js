@@ -390,7 +390,7 @@ export default class LunBoControl extends Component {
                         <div className={style['btn-right']} style={{bottom: btnTop}} onClick={() => this.clickNext()}></div>
                     </div>
                     {/*小圆点点*/}
-                    <div className={style['dots-wrap']} style={{marginLeft: -Number.parseInt(20*number / 2)}}>
+                    <div className={style['dots-wrap']} onMouseOver={this.mouseHandle.bind(this)} onMouseLeave={this.mouseHandle.bind(this)} style={{marginLeft: -Number.parseInt(20*number / 2)}}>
                         {
                             this.props.imgArray.map(function(item,index){
                                 return <span key={index} onClick={()=>this.clickDots(index)} className={this.checkDots(index)}></span>;

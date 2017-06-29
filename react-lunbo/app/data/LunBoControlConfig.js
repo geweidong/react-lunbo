@@ -27,7 +27,7 @@ const LunBoControlConfig = {
         "interval": 2000,//幻灯片滚动的间隔时间
         "scale":0.85, //记录显示比例关系
         "number":5,
-        "autoPlay":false,
+        "autoPlay":true,
         "vertical":"top",  // center或者bottom,居中对齐或底部对齐
         "tweenString":"QuadEaseIn" // 运动方式，缓冲曲线
     }
