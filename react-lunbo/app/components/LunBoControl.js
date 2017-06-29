@@ -165,6 +165,7 @@ export default class LunBoControl extends Component {
     // 鼠标移入li
     mouseLiOver(index) {
         let titleDom = findDOMNode(this.refs.title);
+
         if(index === this.state.activeIndex){
             titleDom.style.bottom = '-64px';
             this.animate(titleDom , {bottom: 0} , 'QuadEaseOut', 18 );
@@ -174,6 +175,7 @@ export default class LunBoControl extends Component {
     // 鼠标移出li
     mouseLiLeave(index) {
         let titleDom = findDOMNode(this.refs.title);
+        // sdfsdfsdfsdf
         if(index === this.state.activeIndex){
             this.animate(titleDom , {bottom: -64} , 'QuadEaseOut', 18 );
         }
@@ -364,9 +366,11 @@ export default class LunBoControl extends Component {
                     <div className={style['poster-main']} style={{width:width,height:height}} onMouseOver={this.mouseHandle.bind(this)} onMouseLeave={this.mouseHandle.bind(this)}>
                         {/*标题*/}
                             <div ref="title" className={style['title-wrap']} style={{width:imgWidth, left:parseInt((width-imgWidth)/2)}}>
-                                <span className={style['title-txt']}>
-                                   {this.props.title[this.state.activeIndex]}
-                                </span>
+                                <div className={style['title-wrap-iner']} style={{width:imgWidth, height:64}}>
+                                    <span className={style['title-txt']}>
+                                       {this.props.title[this.state.activeIndex]}
+                                    </span>
+                                </div>
                             </div>
                         {/*左箭头*/}
                         <div className={style['btn-left']} style={{bottom: btnTop}} onClick={()=>this.clickPrev()}></div>
