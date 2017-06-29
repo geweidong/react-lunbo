@@ -33,46 +33,6 @@ export default class LunBoControl extends Component {
         this.itemsArr = [];
     }
 
-    // 缓动函数
-    // animate(obj,attr_json,_fn) {
-    //     //清除定时器，防止函数未执行完而连续操作本函数
-    //     clearInterval(obj.timer);
-    //     obj.timer=setInterval(() => {
-    //         let flag=true;  //清楚定时器的标识
-    //         for(let attr in attr_json){
-    //             let current=0;      
-    //             if(attr=="opacity"){
-    //                 let opacityNum = parseFloat(obj.style['opacity']).toFixed(2);
-    //                 current = (opacityNum*100)||0;
-    //             }else{  
-    //                 current=parseInt(obj.style[attr]);
-    //             }
-    //             let step=(attr_json[attr]-current)/10; 
-
-    //             step=step>0?Math.ceil(step):Math.floor(step);
-
-    //             if(attr == "opacity"){
-    //                 obj.style.opacity = parseFloat((current+step)/100).toFixed(2);
-    //             }
-    //             else if(attr=="zIndex"){
-    //                 obj.style.zIndex=current+step;
-    //             }
-    //             else{
-    //                 obj.style[attr]=(current+step)+"px";
-    //             }
-
-    //             if(current!=attr_json[attr]){ 
-    //                 flag=false;
-    //             }
-    //         }
-    //         if(flag){
-    //             clearInterval(obj.timer);  
-    //             if(_fn){
-    //                 _fn()
-    //             }
-    //         }
-    //     }, 13)
-    // }
     /*
      * animate函数是动画封装函数
      * @para0  elem参数就是运动的对象
@@ -82,8 +42,8 @@ export default class LunBoControl extends Component {
      * @para4  callback是回调函数，可选
     */
     animate(elem , targetJSON , time , tweenString , callback){
-
-        var Tween = { 
+        // 缓冲描述词集合
+        const Tween = { 
             Linear: function(t, b, c, d) {
                 return c * t / d + b;
             },
@@ -130,113 +90,15 @@ export default class LunBoControl extends Component {
                 if ((t /= d / 2) < 1) return c / 2 * t * t * t * t * t + b;
                 return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
             },
-            //正弦的
-            SineEaseIn: function(t, b, c, d) {
-                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
-            },
-            SineEaseOut: function(t, b, c, d) {
-                return c * Math.sin(t / d * (Math.PI / 2)) + b;
-            },
-            SineEaseInOut: function(t, b, c, d) {
-                return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
-            },
-            ExpoEaseIn: function(t, b, c, d) {
-                return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
-            },
-            ExpoEaseOut: function(t, b, c, d) {
-                return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
-            },
-            ExpoEaseInOut: function(t, b, c, d) {
-                if (t == 0) return b;
-                if (t == d) return b + c;
-                if ((t /= d / 2) < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
-                return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
-            },
-            CircEaseIn: function(t, b, c, d) {
-                return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
-            },
-            CircEaseOut: function(t, b, c, d) {
-                return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
-            },
-            CircEaseInOut: function(t, b, c, d) {
-                if ((t /= d / 2) < 1) return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
-                return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
-            },
-            ElasticEaseIn: function(t, b, c, d, a, p) {
-                if (t == 0) return b;
-                if ((t /= d) == 1) return b + c;
-                if (!p) p = d * .3;
-                if (!a || a < Math.abs(c)) {
-                    a = c;
-                    var s = p / 4;
-                } else var s = p / (2 * Math.PI) * Math.asin(c / a);
-                return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-            },
-            ElasticEaseOut: function(t, b, c, d, a, p) {
-                if (t == 0) return b;
-                if ((t /= d) == 1) return b + c;
-                if (!p) p = d * .3;
-                if (!a || a < Math.abs(c)) {
-                    a = c;
-                    var s = p / 4;
-                } else var s = p / (2 * Math.PI) * Math.asin(c / a);
-                return (a * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b);
-            },
-            ElasticEaseInOut: function(t, b, c, d, a, p) {
-                if (t == 0) return b;
-                if ((t /= d / 2) == 2) return b + c;
-                if (!p) p = d * (.3 * 1.5);
-                if (!a || a < Math.abs(c)) {
-                    a = c;
-                    var s = p / 4;
-                } else var s = p / (2 * Math.PI) * Math.asin(c / a);
-                if (t < 1) return -.5 * (a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-                return a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * .5 + c + b;
-            },
-            //冲过头系列
-            BackEaseIn: function(t, b, c, d, s) {
-                if (s == undefined) s = 1.70158;
-                return c * (t /= d) * t * ((s + 1) * t - s) + b;
-            },
-            BackEaseOut: function(t, b, c, d, s ) {
-                if (s == undefined) s = 1.70158;
-                return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
-            },
-            BackEaseInOut: function(t, b, c, d, s) {
-                if (s == undefined) s = 1.70158;
-                if ((t /= d / 2) < 1) return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
-                return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
-            },
-            //弹跳系列
-            BounceEaseIn: function(t, b, c, d) {
-                return c - Tween.BounceEaseOut(d - t, 0, c, d) + b;
-            },
-            BounceEaseOut: function(t, b, c, d) {
-                if ((t /= d) < (1 / 2.75)) {
-                    return c * (7.5625 * t * t) + b;
-                } else if (t < (2 / 2.75)) {
-                    return c * (7.5625 * (t -= (1.5 / 2.75)) * t + .75) + b;
-                } else if (t < (2.5 / 2.75)) {
-                    return c * (7.5625 * (t -= (2.25 / 2.75)) * t + .9375) + b;
-                } else {
-                    return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
-                }
-            },
-            BounceEaseInOut: function(t, b, c, d) {
-                if (t < d / 2) return Tween.BounceEaseIn(t * 2, 0, c, d) * .5 + b;
-                else return Tween.BounceEaseOut(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
-            }
         };
        
-        var interval = 10;
-        //强行给我们的动画元素增加一个isanimated的属性，是否正在运动
-        elem.isanimated = true;
+        let interval = 15;
         //初始状态，放在origninalJSON里面
-        var originalJSON = {};
+        let originalJSON = {};
         //变化的多少，放在deltaJSON里面
-        var deltaJSON = {};
+        let deltaJSON = {};
 
-        for(var k in targetJSON){
+        for(let k in targetJSON){
             originalJSON[k] = parseFloat(elem.style[k]);
             //把每个targetJSON中的值都去掉px
             targetJSON[k] = parseFloat(targetJSON[k]);
@@ -245,42 +107,37 @@ export default class LunBoControl extends Component {
         }
 
         //总执行函数次数：
-        var maxFrameNumber = time / interval;
+        let maxFrameNumber = time / interval;
         //当前帧编号
-        var frameNumber = 0;
+        let frameNumber = 0;
         //这是一个临时变量一会儿用  
-        var n;
+        let tween;
         //定时器
-        var timer = setInterval(function(){
+        let timer = setInterval(() => {
             //要让所有的属性发生变化
-            for(var k in originalJSON){
-                //动：
-                // n就表示这一帧应该在的位置：
-                n = Tween[tweenString](frameNumber , originalJSON[k] , deltaJSON[k] , maxFrameNumber);
+            for(let k in originalJSON){
+                // tween就表示这一帧应该在的位置：
+                tween = Tween[tweenString](frameNumber , originalJSON[k] , deltaJSON[k] , maxFrameNumber);
                 //根据是不是opacity来设置单位
                 if(k != "opacity"){
-                    elem.style[k] = n + "px";
+                    elem.style[k] = tween + "px";
                 }else{
-                    elem.style[k] = n;
+                    elem.style[k] = tween;
                 }
             }
 
             //计数器
             frameNumber++;
             if(frameNumber == maxFrameNumber){
-                for(var k in targetJSON){
-                    if(k == "opacity"){
-                        elem.style[k] = targetJSON[k];
-                    }else if(k == 'zIndex'){
+                for(let k in targetJSON){
+                    if(k == "opacity" || k == "zIndex"){
                         elem.style[k] = targetJSON[k];
                     }else{
                         elem.style[k] = targetJSON[k] + "px";
                     }
                 }
-                //停表
                 clearInterval(timer);
                 //拿掉是否在动属性，设为false
-                elem.isanimated = false;
                 callback && callback();
             }
         },interval);
