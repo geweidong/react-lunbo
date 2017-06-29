@@ -24,7 +24,7 @@ module.exports = {
         //?modules 这样做只对当前组件有效，不必担心在不同的模块中具有相同的类名可能会造成的问题
       },
       {
-        test: /\.(png|jpg|jpeg)$/,
+        test: /\.(png|jpg|jpeg|gif)$/,
         loader: 'url-loader?limit=40000&name=img/[hash:8].[name].[ext]',
       },
     ]
