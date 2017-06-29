@@ -36,11 +36,11 @@ export default class LunBoControl extends Component {
      * animate函数是动画封装函数
      * @para0  elem参数就是运动的对象
      * @para1  targetJSON参数就是运动的终点状态，可以写px，也可以不写px
-     * @para2  time是运动总时间，毫秒为单位
+     * @para2  maxFrameNumber是帧数，越大就会越慢
      * @para3  tweenString缓冲描述词，比如"Linear"
      * @para4  callback是回调函数，可选
     */
-    animate(elem , targetJSON , tweenString , time, callback){
+    animate(elem , targetJSON , tweenString , maxFrameNumber, callback){
         // 缓冲描述词集合
         const Tween = { 
             Linear: (t, b, c, d) => {
@@ -81,7 +81,7 @@ export default class LunBoControl extends Component {
             }
         };
        
-        let interval = 15;
+        let interval = 13;
         //初始状态，放在origninalJSON里面
         let originalJSON = {};
         //变化的多少，放在deltaJSON里面
@@ -95,8 +95,6 @@ export default class LunBoControl extends Component {
             deltaJSON[k] = targetJSON[k] - originalJSON[k];
         }
 
-        //总执行函数次数：
-        let maxFrameNumber = time / interval;
         //当前帧编号
         let frameNumber = 0;
         //这是一个临时变量一会儿用  
@@ -134,7 +132,7 @@ export default class LunBoControl extends Component {
     // 变化的属性
     rotateStyle(self, next) {
         const { left, top, width, height, zIndex, opacity } = next.style;
-        this.animate(self, {left:left,width:width,height:height,zIndex:zIndex,opacity: opacity,top:top}, this.props.lunboObject.tweenString, 250, () => {
+        this.animate(self, {left:left,width:width,height:height,zIndex:zIndex,opacity: opacity,top:top}, this.props.lunboObject.tweenString, 20, () => {
             ++this.LOOPNUM ;
         });
     }
@@ -157,13 +155,27 @@ export default class LunBoControl extends Component {
   
     // 鼠标移入移出
     mouseHandle(e) {
-        let titleDom = findDOMNode(this.refs.title);
         if(e.type === 'mouseover'){
             clearInterval(this.timer);
-            this.animate(titleDom , {bottom: 0} , 'Linear', 300 );    
         }else if(e.type === 'mouseleave'){
             this.autoPlay();
-            this.animate(titleDom , {bottom: -64} , 'Linear', 300 ); 
+        }
+    }
+
+    // 鼠标移入li
+    mouseLiOver(index) {
+        let titleDom = findDOMNode(this.refs.title);
+        if(index === this.state.activeIndex){
+            titleDom.style.bottom = '-64px';
+            this.animate(titleDom , {bottom: 0} , 'QuadEaseOut', 18 );
+        }
+    }
+
+    // 鼠标移出li
+    mouseLiLeave(index) {
+        let titleDom = findDOMNode(this.refs.title);
+        if(index === this.state.activeIndex){
+            this.animate(titleDom , {bottom: -64} , 'QuadEaseOut', 18 );
         }
     }
 
@@ -350,30 +362,31 @@ export default class LunBoControl extends Component {
                 
                 <div className={style['wrap']}>
                     <div className={style['poster-main']} style={{width:width,height:height}} onMouseOver={this.mouseHandle.bind(this)} onMouseLeave={this.mouseHandle.bind(this)}>
-                    
+                        {/*标题*/}
+                            <div ref="title" className={style['title-wrap']} style={{width:imgWidth, left:parseInt((width-imgWidth)/2)}}>
+                                <span className={style['title-txt']}>
+                                   {this.props.title[this.state.activeIndex]}
+                                </span>
+                            </div>
+                        {/*左箭头*/}
                         <div className={style['btn-left']} style={{bottom: btnTop}} onClick={()=>this.clickPrev()}></div>
-                        
+                        {/*轮播*/}
                         <ul className={style['poster-list']} style={{width:width,height:height}}>
-                           {
-                                this.props.imgArray.map(function(item,index){
-                                    return  <li ref={'items'+index} className={style['poster-item']} style={this.renderstyle(index)} key={index}>
-                                                <a href={this.props.linkArray[index]}>
-                                                    <img width="100%" height="100%" src={item}/>
-                                                    
-                                                </a>
-                                            </li>;
-                                }.bind(this))
-                           }
+                       {
+                            this.props.imgArray.map(function(item,index){
+                                return  <li ref={'items'+index} className={style['poster-item']} onMouseOver={()=>this.mouseLiOver(index)} onMouseLeave={()=>this.mouseLiLeave(index)} style={this.renderstyle(index)} key={index}>
+                                            <a href={this.props.linkArray[index]}>
+                                                <img width="100%" height="100%" src={item}/>
+                                            </a>
+                                        </li>;
+                            }.bind(this))
+                       }
                         </ul>
+                        {/*右箭头*/}
                         <div className={style['btn-right']} style={{bottom: btnTop}} onClick={() => this.clickNext()}></div>
-                        <div ref="title" className={style['title-wrap']} style={{width:imgWidth, left:parseInt((width-imgWidth)/2)}}>
-                            <span className={style['title-txt']}>
-                               {this.props.title[this.state.activeIndex]}
-                            </span>
-                        </div>
                     </div>
+                    {/*小圆点点*/}
                     <div className={style['dots-wrap']} style={{marginLeft: -Number.parseInt(20*number / 2)}}>
-                        {/*这里放置小圆点点*/}
                         {
                             this.props.imgArray.map(function(item,index){
                                 return <span key={index} onClick={()=>this.clickDots(index)} className={this.checkDots(index)}></span>;

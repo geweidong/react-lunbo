@@ -15,31 +15,14 @@ export default class Index extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			hasLoaded: false
 		}
 	}
 
 	componentDidMount() {
-		// 模拟请求后台数据
-		fetch('http://route.showapi.com/582-2?typeId=1&page=1&showapi_appid=29400&showapi_sign=e7977541307547beab3e4aa033adb78f')
-            .then((response) => response.json())
-            .then((data) => {
-                if(data){
-
-                    this.setState({
-                        hasLoaded: true
-                    });
-                    
-                }
-            })
-            .catch((err) => {
-            	console.log(err)
-            })
-            .done();
+		
 	}
 
 	render() {
-		if(this.state.hasLoaded){
 			return (
 				<div className={main.mainPage}>
 	                <div className={main['mark-tab']}>
@@ -56,15 +39,5 @@ export default class Index extends Component {
 	                <div className={main['copyright']}>文网游备字〔2010〕C-CBG 002号</div>
 	            </div>
 			)
-		}else{
-			return (
-				<div className={main.mainPage}>
-					<div style={{textAlign: 'center',marginTop: 300}}>
-						<img src={require('./img/loading.gif')} />
-					</div>
-				</div>
-			)
-		}
-		
 	}
 }
