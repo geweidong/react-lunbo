@@ -357,37 +357,42 @@ export default class LunBoControl extends Component {
         if(vertical == 'bottom'){
             // 43是按钮高度的一半
             btnTop = (height*Math.pow(scale,Math.floor(number / 2)))/2 - 43;
-        }else if(vertical == 'top'){
+        }else if(vertical == 'center'){
             btnTop = height / 2 - 43;
         }
         return (
                 
                 <div className={style['wrap']}>
                     <div className={style['poster-main']} style={{width:width,height:height}} onMouseOver={this.mouseHandle.bind(this)} onMouseLeave={this.mouseHandle.bind(this)}>
-                        {/*标题*/}
-                            <div ref="title" className={style['title-wrap']} style={{width:imgWidth, left:parseInt((width-imgWidth)/2)}}>
-                                <div className={style['title-wrap-iner']} style={{width:imgWidth, height:64}}>
-                                    <span className={style['title-txt']}>
-                                       {this.props.title[this.state.activeIndex]}
-                                    </span>
-                                </div>
-                            </div>
-                        {/*左箭头*/}
-                        <div className={style['btn-left']} style={{bottom: btnTop}} onClick={()=>this.clickPrev()}></div>
+                        
+                        <div style={{width:(width-imgWidth)/2, height:height, position:'absolute',left:0,zIndex:99}}>
+                            {/*左箭头*/}
+                            <div className={style['btn-left']} style={{bottom: btnTop}} onClick={()=>this.clickPrev()}></div>
+                        </div>
                         {/*轮播*/}
                         <ul className={style['poster-list']} style={{width:width,height:height}}>
                        {
                             this.props.imgArray.map(function(item,index){
-                                return  <li ref={'items'+index} className={style['poster-item']} onMouseOver={()=>this.mouseLiOver(index)} onMouseLeave={()=>this.mouseLiLeave(index)} style={this.renderstyle(index)} key={index}>
+                                return  <li ref={'items'+index} className={style['poster-item']}  style={this.renderstyle(index)} key={index}>
                                             <a href={this.props.linkArray[index]}>
                                                 <img width="100%" height="100%" src={item}/>
+                                                {/*标题*/}
+                                                <div ref="title" className={style['title-wrap']} style={{width:imgWidth, left:0}}>
+                                                    <div className={style['title-wrap-iner']} style={{width:imgWidth, height:64}}>
+                                                        <span className={style['title-txt']}>
+                                                           {this.props.title[this.state.activeIndex]}
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </a>
                                         </li>;
                             }.bind(this))
                        }
                         </ul>
-                        {/*右箭头*/}
-                        <div className={style['btn-right']} style={{bottom: btnTop}} onClick={() => this.clickNext()}></div>
+                        <div style={{width:(width-imgWidth)/2, height:height, position:'absolute',right:0,bottom:0,zIndex:99}}>
+                            {/*右箭头*/}
+                            <div className={style['btn-right']} style={{bottom: btnTop}} onClick={() => this.clickNext()}></div>
+                        </div>
                     </div>
                     {/*小圆点点*/}
                     <div className={style['dots-wrap']} onMouseOver={this.mouseHandle.bind(this)} onMouseLeave={this.mouseHandle.bind(this)} style={{marginLeft: -Number.parseInt(20*number / 2)}}>

@@ -24,7 +24,7 @@ const LunBoControlConfig = {
         "scale":0.85, //记录显示比例关系
         "number":3,
         "autoPlay":true,
-        "vertical":"top",  // center或者bottom,居中对齐或底部对齐
+        "vertical":"center",  // center或者bottom,居中对齐或底部对齐
         "tweenString":"QuadEaseIn" // 运动方式，缓冲曲线
     }
 };
